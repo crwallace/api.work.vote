@@ -81,7 +81,8 @@ def geocode(address, jurisdictions, required_precision_km=1., limit=5):
 
 
 class StateViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = State.objects.filter(
         Q(is_active=True) | ~Q(pollworker_website='') | Q(pollworker_website__isnull=True)
     ).order_by('name')
@@ -89,13 +90,15 @@ class StateViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PageViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Page.objects.filter(is_active=True)
     serializer_class = PageSerializer
 
 
 class JurisdictionViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Jurisdiction.objects.filter()
     serializer_class = JurisdictionSerializer
 
@@ -179,7 +182,8 @@ class JurisdictionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SearchViewSet(viewsets.ViewSet):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     @method_decorator(cache_page(60*60*60*2))
     def list(self, request):
