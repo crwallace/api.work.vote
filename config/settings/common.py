@@ -47,7 +47,7 @@ LOCAL_APPS = (
     'jurisdiction',
     'survey',
     'mailman',
-    'pages'
+    'pages',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -286,9 +286,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 51
+    'PAGE_SIZE': 51,
 }
 # END REST FRAMEWORK CONFIGURATION
 
