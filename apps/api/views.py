@@ -9,9 +9,23 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from jurisdiction.models import Jurisdiction
 from django.contrib.gis.geos import Point, GEOSGeometry, MultiPoint
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate
+
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework import viewsets, permissions, status
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK
+)
+
 
 from pages.models import Page
 from jurisdiction.models import State, Jurisdiction, Zipcode
@@ -19,6 +33,22 @@ from jurisdiction.export import export_jurisdiction_emails
 from .serializer import (StateSerializer, JurisdictionSerializer, format_jurisdiction_name, JurisdictionSummarySerializer,
                          PageSerializer)
 
+@permission_classes((AllowAny, ))
+@csrf_exempt
+@api_view(["POST"])
+def obtain_auth_token(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    if username is None or password is None:
+        return Response({'error': 'Please provide both username and password'},
+                        status=HTTP_400_BAD_REQUEST)
+    user = authenticate(username=username, password=password)
+    if not user:
+        return Response({'error': 'Invalid Credentials'},
+                        status=HTTP_404_NOT_FOUND)
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key},
+                    status=HTTP_200_OK)
 
 class NewMapboxQuery(MapboxQuery):
     """ Adds limit support to the mapbox geocoder """
@@ -81,8 +111,9 @@ def geocode(address, jurisdictions, required_precision_km=1., limit=5):
 
 
 class StateViewSet(viewsets.ReadOnlyModelViewSet):
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication) 
+
     queryset = State.objects.filter(
         Q(is_active=True) | ~Q(pollworker_website='') | Q(pollworker_website__isnull=True)
     ).order_by('name')
@@ -90,15 +121,18 @@ class StateViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PageViewSet(viewsets.ReadOnlyModelViewSet):
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    permission_classes = (permissions.IsAuthenticated,)
+
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication) 
+
     queryset = Page.objects.filter(is_active=True)
     serializer_class = PageSerializer
 
 
 class JurisdictionViewSet(viewsets.ReadOnlyModelViewSet):
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication) 
+
     queryset = Jurisdiction.objects.filter()
     serializer_class = JurisdictionSerializer
 
@@ -182,8 +216,9 @@ class JurisdictionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SearchViewSet(viewsets.ViewSet):
-    # permission_classes = (permissions.AllowAny,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication) 
+
 
     @method_decorator(cache_page(60*60*60*2))
     def list(self, request):
