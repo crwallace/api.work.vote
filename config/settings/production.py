@@ -63,7 +63,9 @@ AWS_HEADERS = {
 }
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
+
 STATIC_URL = 'https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
+
 # END STORAGE CONFIGURATION
 
 
@@ -86,3 +88,4 @@ CACHES = {
         }
     }
 }
+
