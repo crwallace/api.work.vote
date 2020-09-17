@@ -27,14 +27,12 @@ from rest_framework.status import (
 )
 
 
-
-
 from pages.models import Page
 from jurisdiction.models import State, Jurisdiction, Zipcode
 from jurisdiction.export import export_jurisdiction_emails
 from .serializer import (StateSerializer, JurisdictionSerializer, format_jurisdiction_name, JurisdictionSummarySerializer,
                          PageSerializer)
-# permission_classes = (permissions.AllowAny,)
+
 @permission_classes((AllowAny, ))
 @csrf_exempt
 @api_view(["POST"])
@@ -115,6 +113,7 @@ def geocode(address, jurisdictions, required_precision_km=1., limit=5):
 class StateViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication, SessionAuthentication, BasicAuthentication) 
+
     queryset = State.objects.filter(
         Q(is_active=True) | ~Q(pollworker_website='') | Q(pollworker_website__isnull=True)
     ).order_by('name')
@@ -122,8 +121,10 @@ class StateViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PageViewSet(viewsets.ReadOnlyModelViewSet):
+
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication, SessionAuthentication) 
+
     queryset = Page.objects.filter(is_active=True)
     serializer_class = PageSerializer
 
@@ -131,6 +132,7 @@ class PageViewSet(viewsets.ReadOnlyModelViewSet):
 class JurisdictionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication, SessionAuthentication) 
+
     queryset = Jurisdiction.objects.filter()
     serializer_class = JurisdictionSerializer
 
@@ -216,6 +218,7 @@ class JurisdictionViewSet(viewsets.ReadOnlyModelViewSet):
 class SearchViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication, SessionAuthentication) 
+
 
     @method_decorator(cache_page(60*60*60*2))
     def list(self, request):
