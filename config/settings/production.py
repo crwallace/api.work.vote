@@ -46,6 +46,7 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
 USE_S3 = env('USE_S3') == 'TRUE'
 
 if USE_S3:
+    # See: http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html#settings
     # aws settings
     AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
@@ -55,11 +56,13 @@ if USE_S3:
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
     AWS_AUTO_CREATE_BUCKET = True
     AWS_QUERYSTRING_AUTH = env.bool("DJANGO_AWS_QUERYSTRING_AUTH", default=False)
+    # see: https://github.com/antonagestam/collectfast
     AWS_PRELOAD_METADATA = True
     # s3 static settings
     AWS_LOCATION = 'static'
     STATIC_URL = 'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    # AWS cache settings, don't change unless you know what you're doing:
     AWS_EXPIRY = 60 * 60 * 24 * 7
     AWS_HEADERS = {
     'Cache-Control': 'max-age=%d, s-maxage=%d, must-revalidate' % (
@@ -70,13 +73,6 @@ else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-
-
-# See: http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html#settings
-
-# see: https://github.com/antonagestam/collectfast
-
-# AWS cache settings, don't change unless you know what you're doing:
 
 # END STORAGE CONFIGURATION
 
