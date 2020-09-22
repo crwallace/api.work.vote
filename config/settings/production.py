@@ -60,7 +60,7 @@ if USE_S3:
     AWS_PRELOAD_METADATA = True
     # s3 static settings
     AWS_LOCATION = 'static'
-    STATIC_URL = 'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     # AWS cache settings, don't change unless you know what you're doing:
     AWS_EXPIRY = 60 * 60 * 24 * 7
