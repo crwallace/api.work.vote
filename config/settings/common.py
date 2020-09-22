@@ -300,9 +300,10 @@ CORS_ALLOW_CREDENTIALS = env.bool('DJANGO_CORS_ALLOW_CREDENTIALS', True)
 
 # TINY MCE
 TINYMCE_DEFAULT_CONFIG = {
-    'plugins': "table,spellchecker,paste,searchreplace,lists",
+    'plugins': "table,spellchecker,paste,searchreplace,lists,link",
     'cleanup_on_startup': True,
-    'toolbar': "numlist bullist undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent",
+    'themes': "silver",
+    'toolbar': "undo redo | styleselect | forecolor | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link image | code numlist bullist",
     'custom_undo_redo_levels': 10,
     'width': 600,
     'height': 500,
